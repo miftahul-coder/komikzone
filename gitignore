@@ -1,0 +1,16 @@
+# Node & Firebase tools (jika kamu pakai Firebase CLI)
+node_modules/
+firebase-debug.log
+.firebaserc
+
+# MacOS, Linux, Windows
+.DS_Store
+Thumbs.db
+
+# Editor config
+.vscode/
+.idea/
+
+# Environment & credential
+.env
+firebase-config.js  # hanya jika kamu simpan API key rahasia (rekomendasi: public key aman disimpan)
