@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KomikZone</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div id="themeToggle" onclick="toggleTheme()">🌙</div>
+
+  <header>
+    <h1>KomikZone</h1>
+    <input type="text" id="searchBar" placeholder="Cari judul komik...">
+  </header>
+
+  <main id="content"></main>
+
+  <nav class="tab-bar">
+    <button onclick="showTab('home')"><i class="fas fa-home"></i><br>Beranda</button>
+    <button onclick="showTab('category')"><i class="fas fa-th-list"></i><br>Kategori</button>
+    <button onclick="showTab('account')"><i class="fas fa-user"></i><br>Akun</button>
+  </nav>
+
+  <script src="firebase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
