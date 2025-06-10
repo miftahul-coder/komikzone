@@ -1,0 +1,53 @@
+<!-- Firebase App + Storage -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"></script>
+
+<!-- Tempat tampilkan gambar -->
+<img id="komikCover" alt="Cover Komik" style="width: 300px; height: 450px; object-fit: cover;">
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+  import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
+
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_BUCKET.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const storage = getStorage(app);
+
+  // Ganti path di bawah dengan lokasi file gambar kamu di Firebase Storage
+  const imageRef = ref(storage, 'covers/naruto.jpg');
+
+  // Ambil URL dan pasang ke tag <img>
+  getDownloadURL(imageRef).then((url) => {
+    document.getElementById('komikCover').src = url;
+  }).catch((error) => {
+    console.error("Gagal memuat gambar:", error);
+  });
+</script>
+
+img/
+├── icons/
+│   ├── home.svg               ← Ikon tab Beranda
+│   ├── category.svg           ← Ikon tab Kategori
+│   ├── account.svg            ← Ikon tab Akun
+│   ├── star-empty.svg         ← Rating kosong
+│   ├── star-filled.svg        ← Rating terisi
+│   ├── dark-mode.svg          ← Tombol tema gelap
+│   └── light-mode.svg         ← Tombol tema terang
+├── covers/
+│   ├── naruto.jpg             ← Cover komik Naruto
+│   ├── batman.jpg             ← Cover komik Batman
+│   └── default-cover.jpg      ← Cover default bila tidak tersedia
+├── chapters/
+│   └── naruto-ch1/
+│       ├── 001.jpg            ← Halaman 1
+│       ├── 002.jpg            ← Halaman 2
+│       └── ...
+└── logo.png                   ← Logo utama KomikZone
