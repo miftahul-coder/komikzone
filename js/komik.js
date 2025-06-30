@@ -53,3 +53,26 @@ async function loadChapterList(komikId) {
   });
 }
 if (document.getElementById('komikDetail')) loadDetailKomik();
+async function loadViewer() {
+  const params = new URLSearchParams(location.search);
+  const komikId = params.get('komik');
+  const chapterId = params.get('chapter');
+
+  const docRef = doc(db, `komik/${komikId}/chapter/${chapterId}`);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    const viewer = document.getElementById('viewer');
+    data.halamanURL.forEach(url => {
+      const img = document.createElement('img');
+      img.src = url;
+      img.style.width = '100%';
+      viewer.appendChild(img);
+    });
+  } else {
+    alert('Chapter tidak ditemukan.');
+  }
+}
+
+if (document.getElementById('viewer')) loadViewer();
