@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KomikZone - Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/admin.js" defer></script>
+</head>
+<body>
+
+  <header>
+    <h1>Panel Admin</h1>
+    <button onclick="logout()">Logout</button>
+  </header>
+
+  <main>
+    <h2>Upload Komik Baru</h2>
+    <form id="uploadKomikForm">
+      <input type="text" id="judul" placeholder="Judul" required>
+      <input type="text" id="penulis" placeholder="Penulis" required>
+      <textarea id="deskripsi" placeholder="Deskripsi" required></textarea>
+      <input type="file" id="cover" accept="image/*" required>
+      <button type="submit">Upload Komik</button>
+    </form>
+
+    <h2>Upload Chapter Baru</h2>
+    <form id="uploadChapterForm">
+      <input type="text" id="komikID" placeholder="ID Komik" required>
+      <input type="text" id="chapterName" placeholder="Nama Chapter" required>
+      <input type="file" id="chapterFiles" accept="image/*,.pdf" multiple required>
+      <button type="submit">Upload Chapter</button>
+    </form>
+  </main>
+
+</body>
+</html>
