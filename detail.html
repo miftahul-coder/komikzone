@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KomikZone - Detail Komik</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/komik.js" defer></script>
+</head>
+<body>
+
+  <header>
+    <button onclick="history.back()">← Kembali</button>
+    <h1>Detail Komik</h1>
+  </header>
+
+  <main id="content">
+    <div id="komikDetail">
+      <!-- Judul, Penulis, Deskripsi, Sampul -->
+    </div>
+
+    <h3>Chapter</h3>
+    <div id="chapterList"></div>
+
+    <h3>Rating</h3>
+    <div id="rating"></div>
+
+    <h3>Komentar</h3>
+    <div id="komentarList"></div>
+    <textarea id="komentarInput" placeholder="Tulis komentar..."></textarea>
+    <button onclick="kirimKomentar()">Kirim</button>
+  </main>
+
+</body>
+</html>
