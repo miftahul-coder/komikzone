@@ -1,0 +1,50 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+:root {
+  --bg: #fff;
+  --text: #000;
+}
+
+body.dark {
+  --bg: #121212;
+  --text: #fff;
+}
+
+header {
+  padding: 10px;
+  background: #6200ea;
+  color: white;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  background: #eee;
+  border-top: 1px solid #ccc;
+}
+
+.bottom-nav a {
+  flex: 1;
+  text-align: center;
+  padding: 8px;
+  text-decoration: none;
+  color: #333;
+}
+
+.bottom-nav a.active {
+  background: #ddd;
+}
+
+.komik-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  padding: 10px;
+}
