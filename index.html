@@ -1,30 +1,813 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>KomikZone - Beranda</title>
-  <link rel="stylesheet" href="css/style.css">
-  <script src="js/main.js" defer></script>
-  <script src="js/komik.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KomikZone - Baca Komik Online</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff6b6b;
+            --secondary-color: #4ecdc4;
+            --background-light: #f8f9fa;
+            --text-light: #212529;
+            --card-light: #ffffff;
+            --background-dark: #121212;
+            --text-dark: #f8f9fa;
+            --card-dark: #1e1e1e;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .light-theme {
+            --bg-color: var(--background-light);
+            --text-color: var(--text-light);
+            --card-bg: var(--card-light);
+        }
+
+        .dark-theme {
+            --bg-color: var(--background-dark);
+            --text-color: var(--text-dark);
+            --card-bg: var(--card-dark);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 70px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            max-width: 500px;
+            margin: 0 20px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Navigation Styles */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 0.8rem;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Section Titles */
+        .section-title {
+            margin: 20px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        /* Comic Grid */
+        .comic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .comic-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+        }
+
+        .comic-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .comic-cover {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .comic-info {
+            padding: 10px;
+        }
+
+        .comic-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .comic-chapter {
+            font-size: 0.8rem;
+            color: var(--secondary-color);
+        }
+
+        .rating {
+            color: #ffc107;
+            margin: 5px 0;
+        }
+
+        /* Category List */
+        .category-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .category-item {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Login Form */
+        .auth-form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .auth-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-google {
+            background-color: #db4437;
+            color: white;
+        }
+
+        .btn-phone {
+            background-color: #10c45c;
+            color: white;
+        }
+
+        /* Comic Detail */
+        .comic-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .comic-detail {
+                flex-direction: row;
+            }
+        }
+
+        .comic-cover-large {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .comic-meta {
+            flex-grow: 1;
+        }
+
+        .chapter-list {
+            margin-top: 20px;
+        }
+
+        .chapter-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Comment Section */
+        .comment-section {
+            margin-top: 30px;
+        }
+
+        .comment {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+        }
+
+        /* Reader */
+        .reader-container {
+            text-align: center;
+        }
+
+        .reader-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .reader-page {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Utility Classes */
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
-<body>
+<body class="light-theme">
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-book-open"></i> KomikZone
+            </div>
+            <div class="search-bar">
+                <input type="text" placeholder="Cari judul komik...">
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </header>
 
-  <header>
-    <h1>KomikZone</h1>
-    <input type="text" id="searchInput" placeholder="Cari judul komik...">
-  </header>
+    <div class="container">
+        <!-- Beranda Tab -->
+        <div id="beranda" class="tab-content active">
+            <h2 class="section-title">Rekomendasi Untukmu</h2>
+            <div class="comic-grid">
+                <!-- Comic cards will be generated here -->
+            </div>
 
-  <main id="content">
-    <h2>Saran Untukmu</h2>
-    <div id="saranKomik" class="komik-grid"></div>
-  </main>
+            <h2 class="section-title">Komik Terbaru</h2>
+            <div class="comic-grid">
+                <!-- Comic cards will be generated here -->
+            </div>
 
-  <nav class="bottom-nav">
-    <a href="index.html" class="active"><img src="img/home.svg"><span>Beranda</span></a>
-    <a href="kategori.html"><img src="img/category.svg"><span>Kategori</span></a>
-    <a href="akun.html"><img src="img/user.svg"><span>Akun</span></a>
-  </nav>
+            <h2 class="section-title">Komik Terpopuler</h2>
+            <div class="comic-grid">
+                <!-- Comic cards will be generated here -->
+            </div>
+        </div>
 
+        <!-- Kategori Tab -->
+        <div id="kategori" class="tab-content">
+            <h2 class="section-title">Kategori Komik</h2>
+            <div class="category-list">
+                <div class="category-item">Aksi</div>
+                <div class="category-item">Romantis</div>
+                <div class="category-item">Komedi</div>
+                <div class="category-item">Drama</div>
+                <div class="category-item">Fantasi</div>
+                <div class="category-item">Horor</div>
+            </div>
+
+            <h2 class="section-title">Top Komik</h2>
+            <div class="comic-grid">
+                <!-- Top rated comics will be here -->
+            </div>
+
+            <h2 class="section-title">Berdasarkan Tokoh</h2>
+            <div class="comic-grid">
+                <!-- Character-based comics will be here -->
+            </div>
+        </div>
+
+        <!-- Akun Tab -->
+        <div id="akun" class="tab-content">
+            <div id="auth-section">
+                <h2 class="section-title text-center">Login / Daftar</h2>
+                <div class="auth-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="Alamat email">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Kata sandi">
+                    </div>
+                    <div class="auth-buttons">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Masuk dengan Email
+                        </button>
+                        <button class="btn btn-google">
+                            <i classfab fa-google"></i> Masuk dengan Google
+                        </button>
+                        <button class="btn btn-phone">
+                            <i class="fas fa-phone"></i> Masuk dengan Nomor Telepon
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="user-section" class="hidden">
+                <h2 class="section-title">Akun Saya</h2>
+                <div class="user-info">
+                    <p>Halo, <span id="user-name">Pengguna</span>!</p>
+                </div>
+
+                <h3 class="section-title">Favorit</h3>
+                <div class="comic-grid" id="favorite-comics">
+                    <!-- Favorite comics will be here -->
+                </div>
+
+                <h3 class="section-title">Lanjut Membaca</h3>
+                <div class="comic-grid" id="continue-reading">
+                    <!-- Continue reading comics will be here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Komik (initially hidden) -->
+        <div id="detail-komik" class="tab-content hidden">
+            <!-- Detail content will be loaded here -->
+        </div>
+
+        <!-- Pembaca Komik (initially hidden) -->
+        <div id="pembaca-komik" class="tab-content hidden">
+            <!-- Reader will be loaded here -->
+        </div>
+
+        <!-- Admin Panel (initially hidden) -->
+        <div id="admin-panel" class="tab-content hidden">
+            <h2 class="section-title">Panel Admin</h2>
+            <div class="admin-panel">
+                <h3>Upload Komik Baru</h3>
+                <!-- Admin form will be here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active" data-tab="beranda">
+            <i class="fas fa-home"></i>
+            <span>Beranda</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="kategori">
+            <i class="fas fa-layer-group"></i>
+            <span>Kategori</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="akun">
+            <i class="fas fa-user"></i>
+            <span>Akun</span>
+        </a>
+    </div>
+
+    <script>
+        // Sample comic data
+        const sampleComics = [
+            {
+                id: 1,
+                title: "Petualangan di Dunia Baru",
+                cover: "https://placehold.co/200x300/ff6b6b/white?text=Petualangan",
+                author: "Ahmad Surya",
+                rating: 4.5,
+                chapters: 24,
+                description: "Kisah petualangan seru di dunia yang penuh misteri dan keajaiban.",
+                chaptersList: [
+                    { number: 1, title: "Pembukaan", date: "2023-01-01" },
+                    { number: 2, title: "Perjalanan Dimulai", date: "2023-01-08" }
+                ]
+            },
+            {
+                id: 2,
+                title: "Cinta di Kampus",
+                cover: "https://placehold.co/200x300/4ecdc4/white?text=Cinta+Kampus",
+                author: "Dewi Lestari",
+                rating: 4.2,
+                chapters: 18,
+                description: "Romansa manis kehidupan mahasiswa di kampus ternama.",
+                chaptersList: [
+                    { number: 1, title: "Hari Pertama", date: "2023-02-01" },
+                    { number: 2, title: "Pertemuan Tak Terduga", date: "2023-02-08" }
+                ]
+            },
+            {
+                id: 3,
+                title: "Pertarungan Terakhir",
+                cover: "https://placehold.co/200x300/45b7d1/white?text=Pertarungan",
+                author: "Budi Pratama",
+                rating: 4.8,
+                chapters: 32,
+                description: "Pertarungan epik antara kebaikan dan kejahatan yang akan menentukan nasib dunia.",
+                chaptersList: [
+                    { number: 1, title: "Kebangkitan", date: "2023-03-01" },
+                    { number: 2, title: "Kekuatan Baru", date: "2023-03-08" }
+                ]
+            },
+            {
+                id: 4,
+                title: "Misteri Kota Tua",
+                cover: "https://placehold.co/200x300/96ceb4/white?text=Misteri+Kota",
+                author: "Rina Wijaya",
+                rating: 4.3,
+                chapters: 16,
+                description: "Mengungkap rahasia kelam yang tersembunyi di balik kota tua yang terlihat damai.",
+                chaptersList: [
+                    { number: 1, title: "Kedatangan", date: "2023-04-01" },
+                    { number: 2, title: "Petunjuk Pertama", date: "2023-04-08" }
+                ]
+            },
+            {
+                id: 5,
+                title: "Dunia Paralel",
+                cover: "https://placehold.co/200x300/feca57/white?text=Dunia+Paralel",
+                author: "Joko Santoso",
+                rating: 4.6,
+                chapters: 28,
+                description: "Menjelajahi dunia paralel yang penuh dengan keajaiban dan bahaya.",
+                chaptersList: [
+                    { number: 1, title: "Gerbang Terbuka", date: "2023-05-01" },
+                    { number: 2, title: "Dunia yang Berbeda", date: "2023-05-08" }
+                ]
+            },
+            {
+                id: 6,
+                title: "Senja di Ufuk Barat",
+                cover: "https://placehold.co/200x300/f9ca24/white?text=Senja+Ufuk",
+                author: "Sari Indah",
+                rating: 4.0,
+                chapters: 12,
+                description: "Kisah perjuangan dan harapan di tengah senja yang penuh makna.",
+                chaptersList: [
+                    { number: 1, title: "Senja Pertama", date: "2023-06-01" },
+                    { number: 2, title: "Kenangan", date: "2023-06-08" }
+                ]
+            }
+        ];
+
+        // DOM Elements
+        const themeToggle = document.getElementById('themeToggle');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const navItems = document.querySelectorAll('.nav-item');
+        const comicGrids = document.querySelectorAll('.comic-grid');
+        const authSection = document.getElementById('auth-section');
+        const userSection = document.getElementById('user-section');
+
+        // Theme Toggle
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            document.body.classList.toggle('dark-theme');
+            
+            const isDarkMode = document.body.classList.contains('dark-theme');
+            themeToggle.innerHTML = isDarkMode ? 
+                '<i class="fas fa-sun"></i>' : 
+                '<i class="fas fa-moon"></i>';
+        });
+
+        // Navigation
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Remove active class from all items
+                navItems.forEach(navItem => navItem.classList.remove('active'));
+                
+                // Add active class to clicked item
+                item.classList.add('active');
+                
+                // Hide all tab contents
+                tabContents.forEach(tab => tab.classList.remove('active'));
+                
+                // Show the selected tab content
+                const tabId = item.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Generate comic cards
+        function generateComicCards(comics, container) {
+            container.innerHTML = '';
+            comics.forEach(comic => {
+                const card = document.createElement('div');
+                card.className = 'comic-card';
+                card.innerHTML = `
+                    <img src="${comic.cover}" alt="${comic.title}" class="comic-cover">
+                    <div class="comic-info">
+                        <div class="comic-title">${comic.title}</div>
+                        <div class="rating">${generateStarRating(comic.rating)}</div>
+                        <div class="comic-chapter">Chapter ${comic.chapters}</div>
+                    </div>
+                `;
+                card.addEventListener('click', () => showComicDetail(comic));
+                container.appendChild(card);
+            });
+        }
+
+        // Generate star rating
+        function generateStarRating(rating) {
+            let stars = '';
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            
+            for (let i = 0; i < fullStars; i++) {
+                stars += '<i class="fas fa-star"></i>';
+            }
+            
+            if (hasHalfStar) {
+                stars += '<i class="fas fa-star-half-alt"></i>';
+            }
+            
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+            for (let i = 0; i < emptyStars; i++) {
+                stars += '<i class="far fa-star"></i>';
+            }
+            
+            return stars;
+        }
+
+        // Show comic detail
+        function showComicDetail(comic) {
+            const detailTab = document.getElementById('detail-komik');
+            detailTab.innerHTML = `
+                <div class="comic-detail">
+                    <img src="${comic.cover}" alt="${comic.title}" class="comic-cover-large">
+                    <div class="comic-meta">
+                        <h2>${comic.title}</h2>
+                        <p>Penulis: ${comic.author}</p>
+                        <div class="rating">${generateStarRating(comic.rating)}</div>
+                        <p>${comic.description}</p>
+                        
+                        <div class="chapter-list">
+                            <h3 class="section-title">Chapter List</h3>
+                            ${comic.chaptersList.map(chapter => `
+                                <div class="chapter-item" data-comic="${comic.id}" data-chapter="${chapter.number}">
+                                    <span>Chapter ${chapter.number}: ${chapter.title}</span>
+                                    <span>${chapter.date}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="comment-section mt-20">
+                    <h3 class="section-title">Komentar</h3>
+                    <div class="form-group">
+                        <textarea placeholder="Tulis komentar..." rows="3" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd;"></textarea>
+                    </div>
+                    <button class="btn btn-primary">Kirim Komentar</button>
+                    
+                    <div class="comments-list mt-20">
+                        <div class="comment">
+                            <div class="comment-header">
+                                <span>User123</span>
+                                <span>5★</span>
+                            </div>
+                            <p>Komik ini keren banget! Plot twist-nya tidak terduga.</p>
+                        </div>
+                        <div class="comment">
+                            <div class="comment-header">
+                                <span>ComicLover</span>
+                                <span>4★</span>
+                            </div>
+                            <p>Gambarnya bagus, ceritanya juga menarik. Tunggu chapter selanjutnya!</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners to chapter items
+            detailTab.querySelectorAll('.chapter-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const comicId = this.getAttribute('data-comic');
+                    const chapterNum = this.getAttribute('data-chapter');
+                    showComicReader(comicId, chapterNum);
+                });
+            });
+            
+            // Show detail tab and hide others
+            tabContents.forEach(tab => tab.classList.remove('active', 'hidden'));
+            detailTab.classList.add('active');
+            
+            // Add a back button behavior
+            const backButton = document.createElement('button');
+            backButton.className = 'btn btn-primary';
+            backButton.innerHTML = '<i class="fas fa-arrow-left"></i> Kembali';
+            backButton.style.marginBottom = '20px';
+            backButton.addEventListener('click', () => {
+                detailTab.classList.add('hidden');
+                document.getElementById('beranda').classList.add('active');
+                navItems[0].classList.add('active');
+            });
+            
+            detailTab.prepend(backButton);
+        }
+
+        // Show comic reader
+        function showComicReader(comicId, chapterNum) {
+            const readerTab = document.getElementById('pembaca-komik');
+            readerTab.innerHTML = `
+                <h2>Chapter ${chapterNum}</h2>
+                <div class="reader-controls">
+                    <button class="btn btn-primary" id="prev-page"><i class="fas fa-chevron-left"></i> Sebelumnya</button>
+                    <span>Halaman <span id="current-page">1</span> dari 5</span>
+                    <button class="btn btn-primary" id="next-page">Selanjutnya <i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="reader-container">
+                    <img src="https://placehold.co/800x1200/333/white?text=Halaman+1" alt="Halaman 1" class="reader-page">
+                </div>
+                <div class="reader-controls">
+                    <button class="btn btn-primary" id="prev-chapter"><i class="fas fa-arrow-left"></i> Chapter Sebelumnya</button>
+                    <button class="btn btn-primary" id="next-chapter">Chapter Selanjutnya <i class="fas fa-arrow-right"></i></button>
+                </div>
+            `;
+            
+            // Show reader tab and hide others
+            tabContents.forEach(tab => tab.classList.remove('active', 'hidden'));
+            readerTab.classList.add('active');
+            
+            // Add a back button behavior
+            const backButton = document.createElement('button');
+            backButton.className = 'btn btn-primary';
+            backButton.innerHTML = '<i class="fas fa-arrow-left"></i> Kembali ke Detail';
+            backButton.style.marginBottom = '20px';
+            backButton.addEventListener('click', () => {
+                readerTab.classList.add('hidden');
+                document.getElementById('detail-komik').classList.add('active');
+            });
+            
+            readerTab.prepend(backButton);
+        }
+
+        // Initialize the page
+        function init() {
+            // Generate comic cards for all grids
+            const grids = document.querySelectorAll('.comic-grid');
+            grids.forEach(grid => {
+                generateComicCards(sampleComics, grid);
+            });
+            
+            // Simulate login (for demo purposes)
+            setTimeout(() => {
+                authSection.classList.add('hidden');
+                userSection.classList.remove('hidden');
+            }, 2000);
+        }
+
+        // Run initialization when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
