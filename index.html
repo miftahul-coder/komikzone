@@ -162,6 +162,7 @@
             overflow: hidden;
             box-shadow: var(--shadow);
             transition: transform 0.3s;
+            cursor: pointer;
         }
 
         .comic-card:hover {
@@ -211,6 +212,7 @@
             padding: 5px 15px;
             border-radius: 20px;
             font-size: 0.9rem;
+            cursor: pointer;
         }
 
         /* Login Form */
@@ -309,6 +311,11 @@
             border-bottom: 1px solid #ddd;
             display: flex;
             justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .chapter-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
         }
 
         /* Comment Section */
@@ -375,7 +382,26 @@
         .mb-20 {
             margin-bottom: 20px;
         }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--secondary-color);
+        }
+
+        .error {
+            color: #dc3545;
+            padding: 10px;
+            text-align: center;
+        }
     </style>
+    
+    <!-- Firebase App (wajib) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <!-- Firebase Authentication -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body class="light-theme">
     <header>
@@ -384,7 +410,7 @@
                 <i class="fas fa-book-open"></i> KomikZone
             </div>
             <div class="search-bar">
-                <input type="text" placeholder="Cari judul komik...">
+                <input type="text" placeholder="Cari judul komik..." id="search-input">
             </div>
             <button class="theme-toggle" id="themeToggle">
                 <i class="fas fa-moon"></i>
@@ -396,18 +422,18 @@
         <!-- Beranda Tab -->
         <div id="beranda" class="tab-content active">
             <h2 class="section-title">Rekomendasi Untukmu</h2>
-            <div class="comic-grid">
-                <!-- Comic cards will be generated here -->
+            <div class="comic-grid" id="recommended-comics">
+                <div class="loading">Memuat komik...</div>
             </div>
 
             <h2 class="section-title">Komik Terbaru</h2>
-            <div class="comic-grid">
-                <!-- Comic cards will be generated here -->
+            <div class="comic-grid" id="new-comics">
+                <div class="loading">Memuat komik...</div>
             </div>
 
             <h2 class="section-title">Komik Terpopuler</h2>
-            <div class="comic-grid">
-                <!-- Comic cards will be generated here -->
+            <div class="comic-grid" id="popular-comics">
+                <div class="loading">Memuat komik...</div>
             </div>
         </div>
 
@@ -415,22 +441,22 @@
         <div id="kategori" class="tab-content">
             <h2 class="section-title">Kategori Komik</h2>
             <div class="category-list">
-                <div class="category-item">Aksi</div>
-                <div class="category-item">Romantis</div>
-                <div class="category-item">Komedi</div>
-                <div class="category-item">Drama</div>
-                <div class="category-item">Fantasi</div>
-                <div class="category-item">Horor</div>
+                <div class="category-item" data-category="action">Aksi</div>
+                <div class="category-item" data-category="romance">Romantis</div>
+                <div class="category-item" data-category="comedy">Komedi</div>
+                <div class="category-item" data-category="drama">Drama</div>
+                <div class="category-item" data-category="fantasy">Fantasi</div>
+                <div class="category-item" data-category="horror">Horor</div>
             </div>
 
             <h2 class="section-title">Top Komik</h2>
-            <div class="comic-grid">
-                <!-- Top rated comics will be here -->
+            <div class="comic-grid" id="top-comics">
+                <div class="loading">Memuat komik...</div>
             </div>
 
             <h2 class="section-title">Berdasarkan Tokoh</h2>
-            <div class="comic-grid">
-                <!-- Character-based comics will be here -->
+            <div class="comic-grid" id="character-comics">
+                <div class="loading">Memuat komik...</div>
             </div>
         </div>
 
@@ -448,14 +474,17 @@
                         <input type="password" id="password" placeholder="Kata sandi">
                     </div>
                     <div class="auth-buttons">
-                        <button class="btn btn-primary">
+                        <button class="btn btn-primary" id="email-login">
                             <i class="fas fa-sign-in-alt"></i> Masuk dengan Email
                         </button>
-                        <button class="btn btn-google">
-                            <i classfab fa-google"></i> Masuk dengan Google
+                        <button class="btn btn-google" id="google-login">
+                            <i class="fab fa-google"></i> Masuk dengan Google
                         </button>
-                        <button class="btn btn-phone">
+                        <button class="btn btn-phone" id="phone-login">
                             <i class="fas fa-phone"></i> Masuk dengan Nomor Telepon
+                        </button>
+                        <button class="btn btn-primary" id="email-register">
+                            <i class="fas fa-user-plus"></i> Daftar dengan Email
                         </button>
                     </div>
                 </div>
@@ -465,16 +494,19 @@
                 <h2 class="section-title">Akun Saya</h2>
                 <div class="user-info">
                     <p>Halo, <span id="user-name">Pengguna</span>!</p>
+                    <button class="btn btn-primary" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
                 </div>
 
                 <h3 class="section-title">Favorit</h3>
                 <div class="comic-grid" id="favorite-comics">
-                    <!-- Favorite comics will be here -->
+                    <div class="loading">Memuat favorit...</div>
                 </div>
 
                 <h3 class="section-title">Lanjut Membaca</h3>
                 <div class="comic-grid" id="continue-reading">
-                    <!-- Continue reading comics will be here -->
+                    <div class="loading">Memuat riwayat bacaan...</div>
                 </div>
             </div>
         </div>
@@ -495,6 +527,23 @@
             <div class="admin-panel">
                 <h3>Upload Komik Baru</h3>
                 <!-- Admin form will be here -->
+                <div class="form-group">
+                    <label for="comic-title">Judul Komik</label>
+                    <input type="text" id="comic-title" placeholder="Judul komik">
+                </div>
+                <div class="form-group">
+                    <label for="comic-author">Penulis</label>
+                    <input type="text" id="comic-author" placeholder="Nama penulis">
+                </div>
+                <div class="form-group">
+                    <label for="comic-description">Deskripsi</label>
+                    <textarea id="comic-description" placeholder="Deskripsi komik" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="comic-cover">Cover URL</label>
+                    <input type="text" id="comic-cover" placeholder="URL gambar cover">
+                </div>
+                <button class="btn btn-primary" id="add-comic-btn">Tambah Komik</button>
             </div>
         </div>
     </div>
@@ -516,7 +565,29 @@
     </div>
 
     <script>
-        // Sample comic data
+        // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBPgPMxkml_Hb1coZ7yugwgQmslHwZ0ftI",
+  authDomain: "komikzone-250706.firebaseapp.com",
+  projectId: "komikzone-250706",
+  storageBucket: "komikzone-250706.firebasestorage.app",
+  messagingSenderId: "841624260677",
+  appId: "1:841624260677:web:186f8c00de7045afdb132c",
+  measurementId: "G-PPQJE814SJ"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+        
+        // Sample comic data (akan diganti dengan data dari Firestore)
         const sampleComics = [
             {
                 id: 1,
@@ -602,7 +673,12 @@
         const themeToggle = document.getElementById('themeToggle');
         const tabContents = document.querySelectorAll('.tab-content');
         const navItems = document.querySelectorAll('.nav-item');
-        const comicGrids = document.querySelectorAll('.comic-grid');
+        const emailLoginBtn = document.getElementById('email-login');
+        const googleLoginBtn = document.getElementById('google-login');
+        const phoneLoginBtn = document.getElementById('phone-login');
+        const emailRegisterBtn = document.getElementById('email-register');
+        const logoutBtn = document.getElementById('logout-btn');
+        const searchInput = document.getElementById('search-input');
         const authSection = document.getElementById('auth-section');
         const userSection = document.getElementById('user-section');
 
@@ -615,6 +691,9 @@
             themeToggle.innerHTML = isDarkMode ? 
                 '<i class="fas fa-sun"></i>' : 
                 '<i class="fas fa-moon"></i>';
+                
+            // Simpan preferensi tema
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
         });
 
         // Navigation
@@ -637,23 +716,164 @@
             });
         });
 
+        // Fungsi untuk login dengan email dan password
+        function loginEmail() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Login berhasil
+                    const user = userCredential.user;
+                    console.log("User logged in:", user);
+                    showUserSection();
+                })
+                .catch((error) => {
+                    console.error("Error signing in:", error);
+                    alert("Login gagal: " + error.message);
+                });
+        }
+        
+        // Fungsi untuk login dengan Google
+        function loginGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    // Login berhasil
+                    const user = result.user;
+                    console.log("User logged in with Google:", user);
+                    showUserSection();
+                })
+                .catch((error) => {
+                    console.error("Error with Google sign-in:", error);
+                    alert("Login dengan Google gagal: " + error.message);
+                });
+        }
+        
+        // Fungsi untuk mendaftar dengan email dan password
+        function registerEmail() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Pendaftaran berhasil
+                    const user = userCredential.user;
+                    console.log("User registered:", user);
+                    showUserSection();
+                })
+                .catch((error) => {
+                    console.error("Error signing up:", error);
+                    alert("Pendaftaran gagal: " + error.message);
+                });
+        }
+        
+        // Fungsi untuk logout
+        function logout() {
+            auth.signOut()
+                .then(() => {
+                    console.log("User signed out");
+                    authSection.classList.remove('hidden');
+                    userSection.classList.add('hidden');
+                })
+                .catch((error) => {
+                    console.error("Error signing out:", error);
+                });
+        }
+        
+        // Fungsi untuk menampilkan section user setelah login
+        function showUserSection() {
+            authSection.classList.add('hidden');
+            userSection.classList.remove('hidden');
+            
+            // Load data user
+            loadUserData();
+        }
+        
+        // Fungsi untuk load data user
+        function loadUserData() {
+            const user = auth.currentUser;
+            if (user) {
+                document.getElementById('user-name').textContent = user.displayName || user.email;
+                
+                // Load komik favorit
+                loadFavorites();
+                
+                // Load lanjut membaca
+                loadContinueReading();
+            }
+        }
+        
+        // Fungsi untuk load komik favorit
+        function loadFavorites() {
+            const user = auth.currentUser;
+            if (user) {
+                // Contoh: menggunakan data lokal (dalam implementasi nyata, gunakan Firestore)
+                const favoritesContainer = document.getElementById('favorite-comics');
+                favoritesContainer.innerHTML = '';
+                
+                // Ambil 3 komik pertama sebagai contoh favorit
+                const favoriteComics = sampleComics.slice(0, 3);
+                
+                if (favoriteComics.length === 0) {
+                    favoritesContainer.innerHTML = '<div class="text-center">Belum ada komik favorit</div>';
+                } else {
+                    favoriteComics.forEach(comic => {
+                        addComicToContainer(comic, favoritesContainer);
+                    });
+                }
+            }
+        }
+        
+        // Fungsi untuk load lanjut membaca
+        function loadContinueReading() {
+            const user = auth.currentUser;
+            if (user) {
+                // Contoh: menggunakan data lokal (dalam implementasi nyata, gunakan Firestore)
+                const continueContainer = document.getElementById('continue-reading');
+                continueContainer.innerHTML = '';
+                
+                // Ambil 3 komik terakhir sebagai contoh lanjut membaca
+                const continueComics = sampleComics.slice(-3);
+                
+                if (continueComics.length === 0) {
+                    continueContainer.innerHTML = '<div class="text-center">Belum ada riwayat baca</div>';
+                } else {
+                    continueComics.forEach(comic => {
+                        addComicToContainer(comic, continueContainer);
+                    });
+                }
+            }
+        }
+
         // Generate comic cards
         function generateComicCards(comics, container) {
             container.innerHTML = '';
+            if (comics.length === 0) {
+                container.innerHTML = '<div class="text-center">Tidak ada komik yang ditemukan</div>';
+                return;
+            }
+            
             comics.forEach(comic => {
-                const card = document.createElement('div');
-                card.className = 'comic-card';
-                card.innerHTML = `
-                    <img src="${comic.cover}" alt="${comic.title}" class="comic-cover">
-                    <div class="comic-info">
-                        <div class="comic-title">${comic.title}</div>
-                        <div class="rating">${generateStarRating(comic.rating)}</div>
-                        <div class="comic-chapter">Chapter ${comic.chapters}</div>
-                    </div>
-                `;
-                card.addEventListener('click', () => showComicDetail(comic));
-                container.appendChild(card);
+                addComicToContainer(comic, container);
             });
+        }
+
+        // Fungsi untuk menambahkan komik ke container
+        function addComicToContainer(comicData, container) {
+            const card = document.createElement('div');
+            card.className = 'comic-card';
+            card.innerHTML = `
+                <img src="${comicData.cover}" alt="${comicData.title}" class="comic-cover">
+                <div class="comic-info">
+                    <div class="comic-title">${comicData.title}</div>
+                    <div class="rating">${generateStarRating(comicData.rating)}</div>
+                    <div class="comic-chapter">Chapter ${comicData.chapters}</div>
+                </div>
+            `;
+            card.addEventListener('click', () => showComicDetail(comicData));
+            container.appendChild(card);
         }
 
         // Generate star rating
@@ -682,6 +902,9 @@
         function showComicDetail(comic) {
             const detailTab = document.getElementById('detail-komik');
             detailTab.innerHTML = `
+                <button class="btn btn-primary" id="back-button">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </button>
                 <div class="comic-detail">
                     <img src="${comic.cover}" alt="${comic.title}" class="comic-cover-large">
                     <div class="comic-meta">
@@ -737,28 +960,25 @@
                 });
             });
             
-            // Show detail tab and hide others
-            tabContents.forEach(tab => tab.classList.remove('active', 'hidden'));
-            detailTab.classList.add('active');
-            
-            // Add a back button behavior
-            const backButton = document.createElement('button');
-            backButton.className = 'btn btn-primary';
-            backButton.innerHTML = '<i class="fas fa-arrow-left"></i> Kembali';
-            backButton.style.marginBottom = '20px';
-            backButton.addEventListener('click', () => {
+            // Back button behavior
+            detailTab.querySelector('#back-button').addEventListener('click', () => {
                 detailTab.classList.add('hidden');
                 document.getElementById('beranda').classList.add('active');
                 navItems[0].classList.add('active');
             });
             
-            detailTab.prepend(backButton);
+            // Show detail tab and hide others
+            tabContents.forEach(tab => tab.classList.remove('active', 'hidden'));
+            detailTab.classList.add('active');
         }
 
         // Show comic reader
         function showComicReader(comicId, chapterNum) {
             const readerTab = document.getElementById('pembaca-komik');
             readerTab.innerHTML = `
+                <button class="btn btn-primary" id="back-button-reader">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </button>
                 <h2>Chapter ${chapterNum}</h2>
                 <div class="reader-controls">
                     <button class="btn btn-primary" id="prev-page"><i class="fas fa-chevron-left"></i> Sebelumnya</button>
@@ -774,40 +994,77 @@
                 </div>
             `;
             
-            // Show reader tab and hide others
-            tabContents.forEach(tab => tab.classList.remove('active', 'hidden'));
-            readerTab.classList.add('active');
-            
-            // Add a back button behavior
-            const backButton = document.createElement('button');
-            backButton.className = 'btn btn-primary';
-            backButton.innerHTML = '<i class="fas fa-arrow-left"></i> Kembali ke Detail';
-            backButton.style.marginBottom = '20px';
-            backButton.addEventListener('click', () => {
+            // Back button behavior
+            readerTab.querySelector('#back-button-reader').addEventListener('click', () => {
                 readerTab.classList.add('hidden');
                 document.getElementById('detail-komik').classList.add('active');
             });
             
-            readerTab.prepend(backButton);
+            // Show reader tab and hide others
+            tabContents.forEach(tab => tab.classList.remove('active', 'hidden'));
+            readerTab.classList.add('active');
         }
+
+        // Event listeners untuk autentikasi
+        emailLoginBtn.addEventListener('click', loginEmail);
+        googleLoginBtn.addEventListener('click', loginGoogle);
+        emailRegisterBtn.addEventListener('click', registerEmail);
+        logoutBtn.addEventListener('click', logout);
+
+        // Deteksi status auth
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User sudah login
+                showUserSection();
+            } else {
+                // User belum login
+                authSection.classList.remove('hidden');
+                userSection.classList.add('hidden');
+            }
+        });
+
+        // Pencarian komik
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            if (searchTerm.length > 2) {
+                // Filter komik berdasarkan judul
+                const filteredComics = sampleComics.filter(comic => 
+                    comic.title.toLowerCase().includes(searchTerm)
+                );
+                
+                // Update semua grid komik dengan hasil pencarian
+                document.querySelectorAll('.comic-grid').forEach(grid => {
+                    generateComicCards(filteredComics, grid);
+                });
+            } else if (searchTerm.length === 0) {
+                // Kembalikan ke semua komik jika pencarian dikosongkan
+                initComics();
+            }
+        });
 
         // Initialize the page
         function init() {
-            // Generate comic cards for all grids
+            // Load preferensi tema
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+                document.body.classList.remove('light-theme');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+            
+            // Generate comic cards
+            initComics();
+        }
+        
+        function initComics() {
             const grids = document.querySelectorAll('.comic-grid');
             grids.forEach(grid => {
                 generateComicCards(sampleComics, grid);
             });
-            
-            // Simulate login (for demo purposes)
-            setTimeout(() => {
-                authSection.classList.add('hidden');
-                userSection.classList.remove('hidden');
-            }, 2000);
         }
 
         // Run initialization when DOM is loaded
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
-</html>
+        </html>
